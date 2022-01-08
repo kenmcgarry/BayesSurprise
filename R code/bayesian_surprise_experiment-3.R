@@ -170,9 +170,59 @@ show(p)
 
 # xtable for latex tables
 xtable(head(SRH.seq.train))
-##########################################################################################
-#decay <- 1/(a*N) * log(1 - 1/((a*N) + (b*N)))
-#decay <- 1/(a*N) * log(1 - 1/((a*N) + (b*N)))
+### interestingness - via differences, distances and support
+# So what are the differences if any between those new sequences flagged as interesting and the others?
 
 
+# 1. SEQUENCE ENTROPY ----------------------------------------------------
+SRH.ient <- seqient(SRH.seq)
+summary(SRH.ient)
+
+# 2. SEQUENCE COMPLEXITY (TURBULENCE) -------------------------------------
+range(seqST(SRH.seq))
+summary(seqST(SRH.seq))
+
+# 3. LONGEST COMMON PREFIX (LCP) -------------------------------------------
+lcp <- seqdist(SRH.seq.test, method = "LCP",norm=FALSE)
+range(lcp)
+
+
+
+# 4. LONGEST COMMON SUBSEQUENCE (LCS) --------------------------------------
+## Normalized LCS distances to the most frequent sequence
+SRH.dref1 <- seqdist(SRH.seq.test, method = "LCS",refseq = 0, norm = "auto", with.missing = TRUE)
+# LCS distances between two subsets of sequences
+set1 <- 1:326
+set2 <- 327:653
+SRH.dref2 <- seqdist(SRH.seq.test, method = "LCS",refseq = list(set1,set2),with.missing = TRUE)
+range(SRH.dref2)##
+
+
+# 5. OPTIMAL MATCHING DISTANCE (OMD) and clustering -------------------------
+
+# 6. EVENT SEQUENCE DISCRIMINATION --------------------------------------------------------
+#    create EVENT sequences and discriminate between surprising and the not-surprising sequences
+sep.seqeperiod <- seqecreate(SRH.seq.test, tevent = "period")
+sep.seqe <- seqecreate(SRH.seq.test)
+sep.seqestate <- seqecreate(SRH.seq.test, tevent = "state")
+
+fsubseq <- seqefsub(sep.seqe, min.support = 20)
+fsubseq[1:20]
+
+#fsubseq <- seqefsub(sep.seqe, pmin.support = 0.01)
+
+SRHNEW <- data.frame(surp,decay,kl)  #
+cohort <- factor(SRHNEW$surp > mean(surp), labels = c("surprising","not-surprising")) # divide into two groups
+#cohort <- factor(SRH$birthyr > 1945, labels = c("<=1945",">1945"))
+
+discrimcohort <- seqecmpgroup(fsubseq, group = cohort, method = "bonferroni")
+discrimcohort[1:10]
+
+seqdf <- cbind(as.character(discrimcohort$subseq), discrimcohort$data)
+seqdf <- seqdf[-c(5,8,9)]  # drop the index, and two residuals
+xtable(seqdf[1:10,])
+
+plot(discrimcohort[1:10],ylim=c(0,0.8))
+
+plot(discrimcohort[1:10],ylim=c(0,1.0),legend.cex=0.0001,legend.title="")
 

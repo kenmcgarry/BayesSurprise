@@ -114,7 +114,7 @@ kl[i] <- round(kullback_leibler_distance(stdPrior,stdPost,testNA=F, unit="log10"
 ent[i] <- shannon.conditional.entropy(stdPost,stdPrior)  
 #shannon.conditional.entropy(stdPost,stdPrior)  
 #ent[i] <- entropy.Dirichlet(stdPost,stdPrior,unit="log10")
-surp[i] <- kl[i]/2
+#surp2[i] <- kl[i]/2
 surp[i] <- mean(unstdPost) - mean(stdPrior)  ###
 decay[i] <- 1/(mean(stdPrior)*i) * log(1 - 1/((mean(stdPrior)*i) + (mean(unstdPost)*i)))
 
@@ -180,45 +180,46 @@ range(seqST(biofam.seq))
 summary(seqST(biofam.seq))
 
 # 3. LONGEST COMMON PREFIX (LCP) -------------------------------------------
-
+lcp <- seqdist(biofam.seq.test, method = "LCP",norm=FALSE)
+range(lcp)
 
 # 4. LONGEST COMMON SUBSEQUENCE (LCS) --------------------------------------
 ## Normalized LCS distances to the most frequent sequence
-biofam.dref1 <- seqdist(biofam.seq, method = "LCS",refseq = 0, norm = "auto")
+biofam.dref1 <- seqdist(biofam.seq.test, method = "LCS",refseq = 0, norm = "auto")
+# LCS distances between two subsets of sequences
+set1 <- 1:250
+set2 <- 251:500
+biofam.dref2 <- seqdist(biofam.seq.test, method = "LCS",refseq = list(set1,set2))
 
+# 5. OPTIMAL MATCHING DISTANCE (OMD) and CLUSTERING -------------------------
 
-# 5. OPTIMAL MATCHING DISTANCE (OMD)  --------------------------------------
+# 6. EVENT SEQUENCE DISCRIMINATION --------------------------------------------------------
+#    create EVENT sequences and discriminate between surprising and the not-surprising sequences
+bf.seqeperiod <- seqecreate(biofam.seq.test, tevent = "period")
+bf.seqe <- seqecreate(biofam.seq.test)
+bf.seqestate <- seqecreate(biofam.seq.test, tevent = "state")
 
-# 6. CLUSTERING OMD --------------------------------------------------------
-
-
-
-
-## create EVENT sequences
-bf.seqeperiod <- seqecreate(biofam.seq, tevent = "period")
-bf.seqe <- seqecreate(biofam.seq)
-bf.seqestate <- seqecreate(biofam.seq, tevent = "state")
-
-fsubseq <- seqefsub(bf.seqe, min.support = 100)
-fsubseq[1:5]
+fsubseq <- seqefsub(bf.seqe, min.support = 20)
+fsubseq[1:10]
 
 fsubseq <- seqefsub(bf.seqe, pmin.support = 0.01)
-cohort <- factor(biofam$birthyr > 1945, labels = c("<=1945",">1945")) # change to interesting and not-interesting
-discrcohort <- seqecmpgroup(fsubseq, group = cohort, method = "bonferroni")
-discrcohort[1:5]
-plot(discrcohort[1:5],ylim=c(0,0.65))
+biofam$surp <- surp  #
+biofam$decay <- decay #
+biofam$kl <- kl  #
 
-## Normalized LCS distances to the most frequent sequence
-biofam.dref1 <- seqdist(biofam.seq, method = "LCS",refseq = 0, norm = "auto")
+biofamNEW <- data.frame(surp,decay,kl)  #
 
-## LCS distances between two subsets of sequences
-set1 <- 1:10
-set2 <- 31:36
-biofam.dref2 <- seqdist(biofam.seq, method = "LCS",refseq = list(set1,set2))
+cohort <- factor(biofamNEW$surp > mean(surp), labels = c("surprising","not-surprising")) # divide into two groups
 
-## Chi-squared distance over successive overlapping intervals of length 4
-biofam.chi.ostep <- seqdist(biofam.seq, method = "CHI2",step = 4, overlap = TRUE)
+discrimcohort <- seqecmpgroup(fsubseq, group = cohort, method = "bonferroni")
+discrimcohort[1:10]
 
-seqdist(biofam.seq, method = "LCP", norm = "auto")
+# create the table for the paper
+seqdf <- cbind(as.character(discrimcohort$subseq), discrimcohort$data)
+seqdf <- seqdf[-c(5,8,9)]  # drop the index, and two residuals
+xtable(seqdf)
+
+# plot the discrimination plot between surprising and not-surprising sequences
+plot(discrimcohort[1:10],ylim=c(0,1.0),legend.cex=0.0001,legend.title="")
 
 

@@ -182,6 +182,81 @@ xtable(head(sepsis.seq.train[c(20,19,10,36,37,39),]))
 seqlength(sepsis.seq.train[70:80,])
 seqlength(sepsis.seq.train[c(20,19,10,36,37,39),])
 
+### interestingness - via differences, distances and support
+# So what are the differences if any between those new sequences flagged as interesting and the others?
+
+
+# 1. SEQUENCE ENTROPY ----------------------------------------------------
+sepsis.ient <- seqient(sepsis.seq)
+summary(sepsis.ient)
+
+# 2. SEQUENCE COMPLEXITY (TURBULENCE) -------------------------------------
+range(seqST(sepsis.seq))
+summary(seqST(sepsis.seq))
+
+# 3. LONGEST COMMON PREFIX (LCP) -------------------------------------------
+lcp <- seqdist(sepsis.seq.test, method = "LCP",norm=FALSE)
+range(lcp)
+median(lcp)
+
+# 4. LONGEST COMMON SUBSEQUENCE (LCS) --------------------------------------
+## Normalized LCS distances to the most frequent sequence
+sepsis.dref1 <- seqdist(sepsis.seq.test, method = "LCS",refseq = 0, norm = "auto")
+# LCS distances between two subsets of sequences
+set1 <- 1:125
+set2 <- 126:251
+sepsis.dref2 <- seqdist(sepsis.seq.test, method = "LCS",refseq = list(set1,set2))
+median(sepsis.dref2)
+
+
+# 5. OPTIMAL MATCHING DISTANCE (OMD) and clustering -------------------------
+ccost <- seqsubm(sepsis.seq, method = "CONSTANT", cval = 2)
+# compute the distances using the matrix and the default indel cost of 1
+sepsis.OM <- seqdist(sepsis.seq, method = "OM", indel=3, sm = ccost)
+sepsis.clust <- agnes(sepsis.OM, diss = TRUE, method = "ward")
+plot(sepsis.clust, which.plots = 2)
+
+cluster2 <- cutree(sepsis.clust, k = 2)
+cluster2 <- factor(sepsis.clust, labels = c("Type 1", "Type 2"))
+
+table(cluster2)
+seqfplot(sepsis.seq, group = cluster2, pbarw = T)
+round(sepsis.OM[1:5, 1:5], 1)
+
+# sequence events
+seqmtplot(sepsis.seq, group = cluster2, ylim=c(0,4))
+
+# creates a 16 x 16 cost matrix (we have 16 symbols)
+couts <- seqsubm(sepsis.seq, method = "TRATE")
+round(couts, 2)
+range(couts)
+
+
+# 6. EVENT SEQUENCE DISCRIMINATION --------------------------------------------------------
+#    create EVENT sequences and discriminate between surprising and the not-surprising sequences
+sep.seqeperiod <- seqecreate(sepsis.seq.test, tevent = "period")
+sep.seqe <- seqecreate(sepsis.seq.test)
+sep.seqestate <- seqecreate(sepsis.seq.test, tevent = "state")
+
+fsubseq <- seqefsub(sep.seqe, min.support = 20)
+fsubseq[1:20]
+
+#fsubseq <- seqefsub(sep.seqe, pmin.support = 0.01)
+
+sepsisNEW <- data.frame(surp,decay,kl)  #
+cohort <- factor(sepsisNEW$surp > mean(surp), labels = c("surprising","not-surprising")) # divide into two groups
+#cohort <- factor(sepsis$birthyr > 1945, labels = c("<=1945",">1945"))
+
+discrimcohort <- seqecmpgroup(fsubseq, group = cohort, method = "bonferroni")
+discrimcohort[1:10]
+
+seqdf <- cbind(as.character(discrimcohort$subseq), discrimcohort$data)
+seqdf <- seqdf[-c(5,8,9)]  # drop the index, and two residuals
+xtable(seqdf[1:10])
+
+plot(discrimcohort[1:10],ylim=c(0,1.0))
+
+
 
 
 
