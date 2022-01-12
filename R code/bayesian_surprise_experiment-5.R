@@ -217,7 +217,7 @@ sepsis.clust <- agnes(sepsis.OM, diss = TRUE, method = "ward")
 plot(sepsis.clust, which.plots = 2)
 
 cluster2 <- cutree(sepsis.clust, k = 2)
-cluster2 <- factor(sepsis.clust, labels = c("Type 1", "Type 2"))
+#cluster2 <- factor(sepsis.clust, labels = c("Type 1", "Type 2"))
 
 table(cluster2)
 seqfplot(sepsis.seq, group = cluster2, pbarw = T)
@@ -241,18 +241,15 @@ sep.seqestate <- seqecreate(sepsis.seq.test, tevent = "state")
 fsubseq <- seqefsub(sep.seqe, min.support = 20)
 fsubseq[1:20]
 
-#fsubseq <- seqefsub(sep.seqe, pmin.support = 0.01)
-
 sepsisNEW <- data.frame(surp,decay,kl)  #
 cohort <- factor(sepsisNEW$surp > mean(surp), labels = c("surprising","not-surprising")) # divide into two groups
-#cohort <- factor(sepsis$birthyr > 1945, labels = c("<=1945",">1945"))
 
 discrimcohort <- seqecmpgroup(fsubseq, group = cohort, method = "bonferroni")
 discrimcohort[1:10]
 
-seqdf <- cbind(as.character(discrimcohort$subseq), discrimcohort$data)
-seqdf <- seqdf[-c(5,8,9)]  # drop the index, and two residuals
-xtable(seqdf[1:10])
+#seqdf <- cbind(as.character(discrimcohort$subseq), discrimcohort$data)
+#seqdf <- seqdf[-c(5,8,9)]  # drop the index, and two residuals
+#xtable(seqdf[1:10])
 
 plot(discrimcohort[1:10],ylim=c(0,1.0))
 
