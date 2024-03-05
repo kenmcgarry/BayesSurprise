@@ -317,6 +317,14 @@ bayes_decay <- function(surp){
   return(decay_para)
 }
 
+logLoss = function(pred, actual){
+  -1*mean(log(pred[model.matrix(~ actual + 0) - pred > 0]))
+}
+
+### Correct formula in native R 
+logLoss2 <- function(pred, actual){
+  -mean(actual * log(pred) + (1 - actual) * log(1 - pred))
+}
 
 
 

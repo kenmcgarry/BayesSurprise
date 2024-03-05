@@ -4,7 +4,7 @@
 
 # Note: Bayesian surprise is the KL divergence from prior to posterior i.e. between the distribution of model 
 # hypothesis before and after observing the data. We should not use entropy or other widely used information 
-# bearing calculations because data such as outliers or random data, though containing a lot of information 
+# bearing calculations because data such as outliers or random data, although containing a lot of information 
 # because they are highly improbable, are not necessarily surprising in the human context and in fact could
 # be very boring!
 
@@ -114,7 +114,7 @@ stdPrior <- prior / sum(prior)
 #    " nats between prior and posterior distributions")
 
 #kl[i] <- KL.plugin(stdPost,stdPrior,unit="log2")
-kl[i] <- round(kullback_leibler_distance(stdPrior,stdPost,testNA=F, unit="log10"),digits=2)
+kl[i] <- round(kullback_leibler_distance(stdPrior,stdPost,testNA=F, unit="log10",epsilon=0.001),digits=2)
 ent[i] <- shannon.conditional.entropy(stdPost,stdPrior)  
 #shannon.conditional.entropy(stdPost,stdPrior)  
 #ent[i] <- entropy.Dirichlet(stdPost,stdPrior,unit="log10")
@@ -156,15 +156,25 @@ p <- ggplot(data=df3, aes(x = x, y = decay))  +
 
 show(p)
 
+df_ent <- df2[1:50,]
+df_kl <- df2[1000:1049,]
+df_sur <- df2[1900:1949,]
+df_kl$x <- 1:nrow(df_sur)
+df_sur$x <- 1:nrow(df_sur)
+
+df_all <- rbind(df_ent,df_kl)
+df_all <- rbind(df_all,df_sur)
+
+
 # A wacky way of plotting, but RStudio has trouble with any ggplot2 plots using "source" commands
 # they will simply not appear unless you do it this way!
-p <- ggplot(data=df2, aes(x = x, y = value, colour = variable))  +
+p <- ggplot(data=df_all, aes(x = x, y = value, colour = variable))  +
   geom_line() +
   theme_ipsum() +
-  xlab("Time") +
+  xlab("Records") +
   ylab("Information value") +
   geom_hline(yintercept=mean(surp), linetype='dotted', col = 'black',size=2) +
-  annotate("text", x = 100, y = mean(surp), label = "Bayesian 'Wow' Level", vjust = -0.5, size=6)
+  annotate("text", x = 25, y = mean(surp), label = "Bayesian 'Wow' Level", vjust = -0.5, size=6)
 
 show(p)
 
@@ -223,6 +233,11 @@ seqdf <- seqdf[-c(5,8,9)]  # drop the index, and two residuals
 xtable(seqdf[1:10,])
 
 plot(discrimcohort[1:10],ylim=c(0,0.8))
-
 plot(discrimcohort[1:10],ylim=c(0,1.0),legend.cex=0.0001,legend.title="")
+# redo figures
+
+
+plot(discrimcohort[1:5,],with.legend=FALSE,horiz=FALSE)
+
+
 

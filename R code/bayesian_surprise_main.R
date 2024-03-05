@@ -3,7 +3,9 @@
 # between our expectations and actual experiences. How surprised should we be based on the size of differences? 
 # ...and if we are surprised by this new pattern is it valid? 
 
-# 20/01/2021; 28/10/2021
+# commenced: 20/01/2021;
+# submitted: 07/01/2022;
+# updated:   29/02/2024
 
 library(dplyr)
 library(ggplot2)
@@ -14,27 +16,32 @@ library(stringr)
 library(stringi)
 library(stringdist)
 library(TraMineR)
+library(TraMineRextras)
+library(ggseqplot)
 library(PST)
 library(SeqDetect)
 library(tidyverse)
 library(tidyr)
 library(hrbrthemes)
 library(xtable)
+library(cluster)
+library(patchwork)
+
+# my methods might be of use to:
+# https://www.frontiersin.org/articles/10.3389/fnhum.2013.00492/full
 
 setwd("C:/common_laptop/R-files/BayesianSurprise")
 rm(list = ls()) # remove any legacy variables and data from previous analysis
 
+#save.image(file='March3rd2024.RData')
+#load('2ndMarch2024.RData')
+
 source("bayesian_surprise_functions.R")
 source("bayesian_surprise_strfunctions.R")
-#source("bayesian_surprise_sequences.R")
-#source("bayesian_surprise_simple_example.R")
-#source("bayesian_surprise_experiments.R")
-#source("bayesian_surprise_experiment-1.R")
-#source("bayesian_surprise_experiment-2.R")
-#source("bayesian_surprise_experiment-3.R") # SRH
-source("bayesian_surprise_experiment-4.R") # Biofam
-#source("bayesian_surprise_experiment-5.R")  # Sepsis
 
-
+#source("bayesian_surprise_WCST.R") # Wisconsin Card sorting test
+#source("bayesian_surprise_CHESS.R")   # CHESS moves dataset
+#source("bayesian_surprise_BIOFAM.R") # Biofam
+#source("bayesian_surprise_SEPSIS.R")  # Sepsis
 
 

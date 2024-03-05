@@ -1,6 +1,6 @@
-# bayesian_surprise_experiments-4.R
+# bayesian_surprise_BIOFAM.R
 # Surprising patterns could be novel and interesting, worthy of investigation.
-# 17/11/2021; 
+# 01/03/2024; 
 
 # Note: Bayesian surprise is the KL divergence from prior to posterior i.e. between the distribution of model 
 # hypothesis before and after observing the data. We should not use entropy or other widely used information 
@@ -24,12 +24,12 @@ seqsample <- sample.int(n = nrow(biofam.seq), size = floor(.75*nrow(biofam.seq))
 biofam.seq.train <- biofam.seq[seqsample, ]
 biofam.seq.test  <- biofam.seq[-seqsample, ]
 
-model4.pst <- pstree(biofam.seq.train, L = 10, nmin = 2, ymin = 0.001)
+biofam.pst <- pstree(biofam.seq.train, L = 10, nmin = 2, ymin = 0.001)
 
-biofam.seq.test <- impute(model4.pst, biofam.seq.test, method="prob")  # get overall probs for each symbol
+biofam.seq.test <- impute(biofam.pst, biofam.seq.test, method="prob")  # get overall probs for each symbol
 
 # Test the PST
-probtest <- PST::predict(model4.pst, biofam.seq.test, decomp=TRUE,output = "prob") # 
+probtest <- PST::predict(biofam.pst, biofam.seq.test, decomp=TRUE,output = "prob") # 
 probtrain <- cprob(biofam.seq.train, L = 0, prob = TRUE)  # overall probs for training dataset
 
 kl <- rep(0,nrow(biofam.seq.test))
@@ -40,7 +40,7 @@ interest <- rep(0,nrow(biofam.seq.test))
 x <- seq(1, length.out = nrow(biofam.seq.test))  # number of test samples for x-axis
   
 for(i in 1:nrow(biofam.seq.test)){
-  probtest <- PST::predict(model4.pst, biofam.seq.test[i,], decomp=TRUE,output = "prob")  
+  probtest <- PST::predict(biofam.pst, biofam.seq.test[i,], decomp=TRUE,output = "prob")  
   
 ####  THIS BLOCK OF CODE BLOCK NEEDS TO RECODED AS A FUNCTION -----------------------------------------------
 # A lot of processing just to attach sequence items (names) to the probababiliies. MAke a dataframe with the

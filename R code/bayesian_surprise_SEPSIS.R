@@ -1,4 +1,4 @@
-# bayesian_surprise_experiments-1.R
+# bayesian_surprise_SEPSIS.R
 # Surprising patterns could be novel and interesting, worthy of investigation.
 # 23/11/2021; 
 
@@ -22,11 +22,11 @@ sepsis.seq.train <- sepsis.seq[seqsample, ]
 sepsis.seq.test  <- sepsis.seq[-seqsample, ]
 
 # Build the PST on training data
-model5.pst <- pstree(sepsis.seq.train, L = 10, nmin = 2, ymin = 0.001)
+sepsis.pst <- pstree(sepsis.seq.train, L = 10, nmin = 1, ymin = 0.001)
 
 
 # Test the PST
-probtest <- PST::predict(model5.pst, sepsis.seq.test , decomp=TRUE,output = "prob")
+probtest <- PST::predict(sepsis.pst, sepsis.seq.test , decomp=TRUE,output = "prob")
 head(probtest)  
 
 probtrain <- cprob(sepsis.seq.train , L = 0, prob = TRUE)  # overall probs for training dataset
@@ -41,7 +41,7 @@ x <- seq(1, length.out = nrow(sepsis.seq.test))  # number of test samples for x-
 
 
 for(i in 1:nrow(sepsis.seq.test)){
-  #probtest <- PST::predict(model5.pst, sepsis.seq.test[i,], decomp=TRUE,output = "prob")  
+  #probtest <- PST::predict(sepsis.pst, sepsis.seq.test[i,], decomp=TRUE,output = "prob")  
   
   ####  THIS BLOCK OF CODE BLOCK NEEDS TO RECODED AS A FUNCTION -----------------------------------------------
   # A lot of processing just to attach sequence items (names) to the probababiliies. MAke a dataframe with the
@@ -227,7 +227,7 @@ sepsis.clust <- agnes(sepsis.OM, diss = TRUE, method = "ward")
 plot(sepsis.clust, which.plots = 2)
 
 cluster2 <- cutree(sepsis.clust, k = 2)
-cluster2 <- factor(sepsis.clust, labels = c("Type 1", "Type 2"))
+#cluster2 <- factor(sepsis.clust, labels = c("Type 1", "Type 2"))
 
 table(cluster2)
 seqfplot(sepsis.seq, group = cluster2, pbarw = T)
