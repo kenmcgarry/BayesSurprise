@@ -3,3 +3,18 @@ In this work we employ Bayesian surprise to detect interesting/anomalous pattern
 
 This work has been accepted for publication in the Expert Systems Journal by Wiley.
 
+## References
+
+Baldi P., Itti L.. Of Bits and Wows: A Bayesian Theory of Surprise with Applications to Attention. Neural Networks.
+2010;23:649-666.
+
+Barto Andrew, Mirolli Marco, Baldassarre Gianluca. Novelty or Surprise?. Frontiers in Psychology. 2013;4:907.
+
+Itti L., Baldi P.. A principled approach to detecting surprising events in video. In: :631-637; 2005.
+
+Becattini N., Borgianni Y., Cascini G., Rotini F.. Surprise and design creativity: investigating the drivers of unexpectedness.
+International Journal of Design Creativity and Innovation. 2017;5(1-2):29-47.
+
+Kumar M., Goldstein A., Michelmann S., Zacks J., Hasson U., Norman K.. Bayesian Surprise Predicts Human Event
+Segmentation in Story Listening. Cognitive Science. 2023;47(10):e13343.
+
